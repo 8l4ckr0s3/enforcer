@@ -16,7 +16,7 @@ const {
     COOKIE_SECRET,
     COOKIE_NAME,
     DATABASE_URL
-} = Bun.env
+} = import.meta.env
 
 export const config = configSchema.parse({
     port: parseInt(PORT),

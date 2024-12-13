@@ -1,0 +1,30 @@
+---
+import Layout from "@/src/layouts/Layout.astro";
+import { actions } from "astro:actions";
+
+function handleResult() {
+    const response = Astro.getActionResult(actions.login);
+
+    if (!response) return;
+
+    const { data, error } = response;
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    console.log(data);
+}
+
+handleResult();
+---
+
+<Layout>
+    <form method='POST' action={actions.login}>
+        <h1>Login page</h1>
+        <input type='text' name='username' placeholder='Username or email' />
+        <input type='password' name='password' placeholder='Password' />
+        <button>Login</button>
+    </form>
+</Layout>
