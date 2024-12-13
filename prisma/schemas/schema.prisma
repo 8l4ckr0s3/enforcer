@@ -1,0 +1,77 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model TwoFactorAuthentication {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  app       Boolean  @default(false)
+  sms       Boolean  @default(false)
+  email     Boolean  @default(false)
+  secret    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Theme {
+  LIGHT
+  DARK
+}
+
+model Preferences {
+  id                  String   @id @default(uuid())
+  user                User     @relation(fields: [userId], references: [id])
+  userId              String
+  theme               Theme    @default(LIGHT)
+  changePasswordEvery Int      @default(90)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model OldPassword {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id                      String                    @id @default(uuid())
+  username                String                    @unique
+  email                   String                    @unique
+  phoneNumber             String?
+  password                String
+  TwoFactorAuthentication TwoFactorAuthentication[]
+  Preferences             Preferences[]
+  OldPassword             OldPassword[]
+  Session                 Session[]
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  lastPasswordChange      DateTime                  @default(now())
+}
+
+enum Token {
+  ACCESS
+  REFRESH
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  type      Token
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+}
